@@ -1,0 +1,12 @@
+on: [pull_request]
+
+jobs:
+  demo_job:
+    runs-on: ubuntu-latest
+    name: Demonstrate usage
+    steps:
+    - name: Run the analysis action
+      id: apache-commit-info-action
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      uses: matthiasblaesing/github-action-apache-commit-info@1.0

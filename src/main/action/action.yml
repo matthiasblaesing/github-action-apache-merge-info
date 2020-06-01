@@ -1,0 +1,5 @@
+name: 'Show commit info for Apache projects'
+description: 'Shows author info for pull requests the GitHub UI hides. It also checks the ICLA state of an author.'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

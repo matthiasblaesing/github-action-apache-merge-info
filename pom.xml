@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.doppel-helix.github.action.apache-commit-info</groupId>
+    <artifactId>github-action-apache-commit-info</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/matthiasblaesing/github-action-apache-commit-info.git</connection>
+        <developerConnection>scm:git:git@github.com:matthiasblaesing/github-action-apache-commit-info.git</developerConnection>
+        <url>https://github.com/matthiasblaesing/github-action-apache-commit-info</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>1.112</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/LICENSE</resource>
+                                    <resource>META-INF/LICENSE.txt</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>eu.doppel_helix.github.action.apache_commit_info.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>de.jutzig</groupId>
+                <artifactId>github-release-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <!-- This is invoked from the release-plugin -->
+                        <id>publish-to-github</id>
+                        <phase>direct</phase>
+                        <goals>
+                            <goal>release</goal>
+                        </goals>
+                        <configuration>
+                            <!-- github tries to be clever and creates broken releases! -->
+                            <deleteRelease>true</deleteRelease>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <description />
+                    <releaseName>${project.version}</releaseName>
+                    <tag>${project.version}</tag>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>${project.artifactId}.jar</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <tagNameFormat>@{version}</tagNameFormat>
+                    <preparationGoals>clean verify org.apache.maven.plugins:maven-resources-plugin:copy-resources@updateartifacts org.apache.maven.plugins:maven-scm-plugin:checkin@commitartifacts</preparationGoals>
+                    <goals>clean package de.jutzig:github-release-plugin:release@publish-to-github</goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.11.2</version>
+                <executions>
+                    <execution>
+                        <!-- This is invoked from the release-plugin -->
+                        <id>commitartifacts</id>
+                        <phase>direct</phase>
+                        <configuration>
+                            <message>[maven-scm-plugin] set ${project.version} version in files</message>
+                            <includes>Dockerfile,action.yml,entrypoint.sh</includes>
+                            <basedir>./</basedir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <!-- This is invoked from the release-plugin -->
+                        <id>updateartifacts</id>
+                        <phase>direct</phase>
+                        <configuration>
+                            <outputDirectory>./</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/action</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
