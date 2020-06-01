@@ -26,4 +26,4 @@ jobs:
       id: apache-commit-info-action
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      uses: matthiasblaesing/github-action-apache-commit-info@1.0
+      uses: matthiasblaesing/github-action-apache-commit-info@1.1
