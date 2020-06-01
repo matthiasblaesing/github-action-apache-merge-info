@@ -29,3 +29,9 @@ A sample can be found in the .github/workflows/main.yml file. GitHub by default
 places all relevant information in the environment of the running action. The
 only information, that needs to be explicitly passed is the GITHUB_TOKEN. The
 token is needed to be able to create the info comment on the PR.
+
+Democontent
+-----------
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
